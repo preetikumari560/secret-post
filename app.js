@@ -22,7 +22,7 @@ const passport= require('passport')
 const passportLocalMongoose= require('passport-local-mongoose') //passport-local-mongoose, also perform salting nd hashing
 // no need to require passport-local,bcoz it use local-passport
 
-
+var FacebookStrategy = require('passport-facebook').Strategy;
 const GoogleStrategy = require('passport-google-oauth20').Strategy
 const findOrCreate =require('mongoose-findorcreate')
 const app = express()
@@ -46,13 +46,18 @@ app.use(session({
   mongoose.set('strictQuery',true)
 
 
-mongoose.connect('mongodb://127.0.0.1:27017/userDb')
+// mongoose.connect('mongodb://127.0.0.1:27017/userDb')
+
+const mongoUrl=`mongodb+srv://${process.env.CLIENT_IDm}/userDb`
+
+mongoose.connect(mongoUrl);
 
 const userSchema = new mongoose.Schema({
         email:String,
         password:String,
         googleId:String,
-        secret:String
+        secret:String,
+        facebookId:String,
 })
 
 
@@ -108,13 +113,13 @@ passport.serializeUser(function(user, cb) {
   })
     
     passport.use(new GoogleStrategy({
-    clientID: process.env.CLIENT_ID,
-    clientSecret: process.env.CLIENT_SECRET,
+    clientID: process.env.CLIENT_IDg,
+    clientSecret: process.env.CLIENT_SECRETg,
     callbackURL: "http://localhost:3000/auth/google/secrets"
   },
 
   function(accessToken, refreshToken, profile, cb) {
-    console.log(profile)
+    console.log(profile+" google profile")
       // need to install  "npm install mongoose-findorcreate"
     User.findOrCreate({ username: profile.emails[0].value,googleId: profile.id }, function (err, user) {
       return cb(err, user);
@@ -122,7 +127,21 @@ passport.serializeUser(function(user, cb) {
   }
 ))
 
+////////////////////////////////////////
 
+passport.use(new FacebookStrategy({
+    clientID: process.env.CLIENT_IDf,
+    clientSecret: process.env.CLIENT_SECRETf,
+    callbackURL: "http://localhost:3000/auth/facebook/secrets"
+  },
+  function(accessToken, refreshToken, profile, cb) {
+    console.log(profile +" facebook profile")
+    User.findOrCreate({ facebookId: profile.id }, function (err, user) {
+      return cb(err, user);
+    });
+  }
+));
+///////////////////////////////////////////
 
 app.get('/',(req,res)=>
 {
@@ -132,10 +151,21 @@ app.get('/',(req,res)=>
 app.get('/auth/google',
   passport.authenticate('google', { scope: ['profile','email'] }));
 
+
+  app.get('/auth/facebook',
+  passport.authenticate('facebook'));
+
   app.get('/login',(req,res)=>
 {
     res.render('login')
 })
+
+app.get('/auth/facebook/secrets',
+  passport.authenticate('facebook', { failureRedirect: '/login' }),
+  function(req, res) {
+    // Successful authentication, redirect home.
+    res.redirect('/secrets');
+  });
 
 app.get('/auth/google/secrets', 
   passport.authenticate('google', { failureRedirect: '/login' }),
@@ -310,7 +340,7 @@ app.post("/submit",(req,res)=>{
     console.log(req.user.id)
     User.findById(req.user.id,(err,foundOne)=>{
             if(err)
-            {
+            {     
                     console.log(err)
             }
             else{
