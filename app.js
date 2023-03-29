@@ -116,9 +116,9 @@ passport.serializeUser(function(user, cb) {
     clientID: process.env.CLIENT_IDg,
     clientSecret: process.env.CLIENT_SECRETg,
     callbackURL: "https://secret-post.onrender.com/auth/google/secrets",
-    userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
+    // userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
 
-    enableProof: true
+    // enableProof: true
   
   },
 
@@ -219,7 +219,7 @@ app.get('/secrets', (req, res) => {
         console.log(err);
       } else {
         if (foundUsers) {
-          res.render('secrets', { usersWithSecrets: foundUsers });
+          res.render('secrets', { usersPostedSecrets:foundSecret});
         }
       }
     });
