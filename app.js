@@ -115,7 +115,11 @@ passport.serializeUser(function(user, cb) {
     passport.use(new GoogleStrategy({
     clientID: process.env.CLIENT_IDg,
     clientSecret: process.env.CLIENT_SECRETg,
-    callbackURL: "https://secret-post.onrender.com/auth/google/secrets"
+    callbackURL: "https://secret-post.onrender.com/auth/google/secrets",
+    userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
+
+    enableProof: true
+  
   },
 
   function(accessToken, refreshToken, profile, cb) {
