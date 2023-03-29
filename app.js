@@ -36,7 +36,7 @@ app.use(session({
     secret: 'ratbat cat',
     resave: false,
     saveUninitialized: false,
-    cookie: {}
+    // cookie: {}
     
   }))
 
@@ -208,22 +208,21 @@ app.get('/register',(req,res)=>
 
 
 //////////////////////////////
-app.get("/secrets", function(req,res) {
-  // The below line was added so we can't display the "/secrets" page
-  // after we logged out using the "back" button of the browser, which
-  // would normally display the browser cache and thus expose the 
-  // "/secrets" page we want to protect. Code taken from this post.
-  res.set(
-      'Cache-Control', 
-      'no-cache, private, no-store, must-revalidate, max-stal e=0, post-check=0, pre-check=0'
-  );
-  if(req.isAuthenticated()) {
-      res.render("secrets");        
+app.get('/secrets', (req, res) => {
+  if (req.isAuthenticated()) {
+    User.find({ secret: { $ne: null } }, function (err, foundUsers) {
+      if (err) {
+        console.log(err);
+      } else {
+        if (foundUsers) {
+          res.render('secrets', { usersWithSecrets: foundUsers });
+        }
+      }
+    });
   } else {
-      res.redirect("/login");
+    res.redirect('/login');
   }
 });
-
 
 
 // app.get('/secrets',(req,res)=>{
