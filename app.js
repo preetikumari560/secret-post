@@ -115,7 +115,7 @@ passport.serializeUser(function(user, cb) {
     passport.use(new GoogleStrategy({
     clientID: process.env.CLIENT_IDg,
     clientSecret: process.env.CLIENT_SECRETg,
-    callbackURL: "http://localhost:3000/auth/google/secrets"
+    callbackURL: "https://secret-post.onrender.com/auth/google/secrets"
   },
 
   function(accessToken, refreshToken, profile, cb) {
@@ -132,7 +132,7 @@ passport.serializeUser(function(user, cb) {
 passport.use(new FacebookStrategy({
     clientID: process.env.CLIENT_IDf,
     clientSecret: process.env.CLIENT_SECRETf,
-    callbackURL: "http://localhost:3000/auth/facebook/secrets"
+    callbackURL: "https://secret-post.onrender.com/auth/facebook/secrets"
   },
   function(accessToken, refreshToken, profile, cb) {
     console.log(profile +" facebook profile")
@@ -151,6 +151,13 @@ app.get('/',(req,res)=>
 app.get('/auth/google',
   passport.authenticate('google', { scope: ['profile','email'] }));
 
+  // app.route('/auth/google')
+
+  // .get(passport.authenticate('google', {
+
+  //   scope: ['profile']
+
+  // }));
 
   app.get('/auth/facebook',
   passport.authenticate('facebook'));
