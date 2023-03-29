@@ -116,9 +116,9 @@ passport.serializeUser(function(user, cb) {
     clientID: process.env.CLIENT_IDg,
     clientSecret: process.env.CLIENT_SECRETg,
     callbackURL: "https://secret-post.onrender.com/auth/google/secrets",
-    // userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
+    userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
 
-    // enableProof: true
+    enableProof: true
   
   },
 
@@ -214,11 +214,11 @@ app.get('/register',(req,res)=>
 //////////////////////////////
 app.get('/secrets', (req, res) => {
   if (req.isAuthenticated()) {
-    User.find({ secret: { $ne: null } }, function (err, foundUsers) {
+    User.find({ secret: { $ne: null } }, function (err, foundSecret) {
       if (err) {
         console.log(err);
       } else {
-        if (foundUsers) {
+        if (foundSecret) {
           res.render('secrets', { usersPostedSecrets:foundSecret});
         }
       }
