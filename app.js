@@ -132,7 +132,8 @@ passport.serializeUser(function(user, cb) {
 passport.use(new FacebookStrategy({
     clientID: process.env.CLIENT_IDf,
     clientSecret: process.env.CLIENT_SECRETf,
-    callbackURL: "https://secret-post.onrender.com/auth/facebook/secrets"
+    callbackURL: "https://secret-post.onrender.com/auth/facebook/secrets",
+    enableProof: true
   },
   function(accessToken, refreshToken, profile, cb) {
     console.log(profile +" facebook profile")
@@ -187,23 +188,41 @@ app.get('/register',(req,res)=>
     res.render('register')
 })
 
-app.get('/secrets',(req,res)=>{
+// app.get('/secrets',(req,res)=>{
 
-    User.find({'secret':{$ne:null}},(err,foundSecret)=>{
-            if(err)
-            {
-                    console.log(err)
-            }
-            else
-            {
-                if(foundSecret){
-                res.render('secrets',{usersPostedSecrets:foundSecret})
-                }
-            }
-    })
+//     User.find({'secret':{$ne:null}},(err,foundSecret)=>{
+//             if(err)
+//             {
+//                     console.log(err)
+//             }
+//             else
+//             {
+//                 if(foundSecret){
+//                 res.render('secrets',{usersPostedSecrets:foundSecret})
+//                 }
+//             }
+//     })
  
 
-})
+// })
+
+
+//////////////////////////////
+app.get("/secrets", function(req,res) {
+  // The below line was added so we can't display the "/secrets" page
+  // after we logged out using the "back" button of the browser, which
+  // would normally display the browser cache and thus expose the 
+  // "/secrets" page we want to protect. Code taken from this post.
+  res.set(
+      'Cache-Control', 
+      'no-cache, private, no-store, must-revalidate, max-stal e=0, post-check=0, pre-check=0'
+  );
+  if(req.isAuthenticated()) {
+      res.render("secrets");        
+  } else {
+      res.redirect("/login");
+  }
+});
 
 
 
