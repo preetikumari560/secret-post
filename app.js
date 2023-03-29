@@ -214,12 +214,12 @@ app.get('/register',(req,res)=>
 //////////////////////////////
 app.get('/secrets', (req, res) => {
   if (req.isAuthenticated()) {
-    User.find({ secret: { $ne: null } }, function (err, foundUser) {
+    User.find({ secret: { $ne: null } }, function (err, foundSecret) {
       if (err) {
         console.log(err);
       } else {
-        if (foundUser) {
-          res.render('secrets', { usersPostedSecrets:foundUser});
+        if (foundSecret) {
+          res.render('secrets', { usersPostedSecrets:foundSecret});
         }
       }
     });
