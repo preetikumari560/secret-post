@@ -52,11 +52,15 @@ const mongoUrl=`mongodb+srv://${process.env.CLIENT_IDm}/userDb`
 
 mongoose.connect(mongoUrl);
 
+
+//for listing secret of single user:
+const secrets= "";
+
 const userSchema = new mongoose.Schema({
         email:String,
         password:String,
         googleId:String,
-        secret:String,
+        secret:[secrets],
         facebookId:String,
 })
 
@@ -78,10 +82,12 @@ const User =  new mongoose.model("user",userSchema)
 // use passport local mongoose to create a local log in strategy and set a passport to serialize and deserialize user
 passport.use(User.createStrategy());
 
-// // use local type, serialize and deserialize of model for passport session 
+//// **Note : use local type, serialize and deserialize of model for passport session 
+
 // passport.serializeUser(User.serializeUser());
 // passport.deserializeUser(User.deserializeUser());
 
+//// **Note : use hosted type, serialize and deserialize of model for passport session 
 passport.serializeUser(function(user, cb) {
 
     process.nextTick(function() {
@@ -112,6 +118,9 @@ passport.serializeUser(function(user, cb) {
   
   })
     
+
+    // this callback url  use for local server :
+    // callbackURL: "https://localhost:3000/auth/google/secrets",
     passport.use(new GoogleStrategy({
     clientID: process.env.CLIENT_IDg,
     clientSecret: process.env.CLIENT_SECRETg,
@@ -132,7 +141,8 @@ passport.serializeUser(function(user, cb) {
 ))
 
 ////////////////////////////////////////
-
+  // this callback url  use for local server :
+//    callbackURL: "https://secret-post.onrender.com/auth/facebook/secrets",
 passport.use(new FacebookStrategy({
     clientID: process.env.CLIENT_IDf,
     clientSecret: process.env.CLIENT_SECRETf,
@@ -364,27 +374,43 @@ app.post('/login', passport.authenticate('local',
 { successRedirect: '/secrets', failureRedirect: '/login' }));
 
 
-app.post("/submit",(req,res)=>{
-    const submittedSecret = req.body.secret
-    console.log(req.user.id)
-    User.findById(req.user.id,(err,foundOne)=>{
-            if(err)
-            {     
-                    console.log(err)
-            }
-            else{
-                    if(foundOne){
 
-                    foundOne.secret= submittedSecret
-                    foundOne.save(()=>{
-                        res.redirect('/secrets')
-                    
-                    })
-                }
-            }
-    })
 
-})
+
+app.post("/submit", (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.redirect("/login");
+    }
+
+    const submittedSecret = req.body.secret;
+    console.log(submittedSecret);
+    console.log(req.user.id);
+
+    User.findById(req.user.id, (err, foundOne) => {
+        if (err) {
+            console.error("Error finding user:", err);
+            return res.redirect("/secrets");
+        }
+
+        if (!foundOne) {
+            console.error("User not found");
+            return res.redirect("/secrets");
+        }
+
+        // Push the new secret to the existing secrets array
+        foundOne.secret.push({ secret: submittedSecret });
+
+        foundOne.save((err) => {
+            if (err) {
+                console.error("Error saving secret:", err);
+                return res.redirect("/secrets");
+            }
+
+            console.log("Secret saved:", submittedSecret);
+            res.redirect("/secrets");
+        });
+    });
+});
 
 
 
