@@ -51,17 +51,12 @@ app.use(session({
 const mongoUrl=`mongodb+srv://${process.env.CLIENT_IDm}/userDb`
 
 mongoose.connect(mongoUrl);
-const userSecret = new mongoose.Schema({
-secret :""
-
-})
-// const UserSecretModel = mongoose.model('UserSecretModel', userSecret);
 
 const userSchema = new mongoose.Schema({
     email: String,
     password: String,
     googleId: String,
-    secret: [userSecret],
+    secret: [String],
     facebookId: String,
 });
 
@@ -231,7 +226,10 @@ app.get('/secrets', (req, res) => {
         console.log(err);
       } else {
         if (foundSecret) {
-        console.log(foundSecret)
+        foundSecret.forEach(element => {
+         console.log( element.secret)
+        });
+        // console.log(foundSecret.secret)
           res.render('secrets', { usersPostedSecrets:foundSecret});
         }
       }
