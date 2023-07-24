@@ -51,15 +51,17 @@ app.use(session({
 const mongoUrl=`mongodb+srv://${process.env.CLIENT_IDm}/userDb`
 
 mongoose.connect(mongoUrl);
+const userSecret = new mongoose.Schema({
+secret :String
 
+})
+const UserSecretModel = mongoose.model('UserSecretModel', userSecret);
 
 const userSchema = new mongoose.Schema({
     email: String,
     password: String,
     googleId: String,
-    secret: [{
-        secret: String // Array of objects with 'secret' property of type String
-    }],
+    secret: [userSecret],
     facebookId: String,
 });
 
