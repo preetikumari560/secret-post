@@ -396,9 +396,8 @@ app.post("/submit", (req, res) => {
             return res.redirect("/secrets");
         }
 
-        // Convert the submittedSecret to an array and push it to the existing secrets array
-        const secretsArray = submittedSecret.split(/\s*,\s*/).filter(Boolean);
-        foundOne.secret.push(...secretsArray);
+
+        foundOne.secret.push(submittedSecret);
 
         foundOne.save((err) => {
             if (err) {
@@ -406,7 +405,7 @@ app.post("/submit", (req, res) => {
                 return res.redirect("/secrets");
             }
 
-            console.log("Secret saved:", secretsArray);
+            console.log("Secret saved:", submittedSecret);
             res.redirect("/secrets");
         });
     });
