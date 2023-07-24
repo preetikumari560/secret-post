@@ -376,8 +376,6 @@ app.post('/login', passport.authenticate('local',
 
 
 
-
-
 app.post("/submit", (req, res) => {
     if (!req.isAuthenticated()) {
         return res.redirect("/login");
@@ -398,8 +396,9 @@ app.post("/submit", (req, res) => {
             return res.redirect("/secrets");
         }
 
-        // Push the new secret to the existing secrets array
-        foundOne.secret.push({ secret: submittedSecret });
+        // Convert the submittedSecret to an array and push it to the existing secrets array
+        const secretsArray = submittedSecret.split(/\s*,\s*/).filter(Boolean);
+        foundOne.secret.push(...secretsArray);
 
         foundOne.save((err) => {
             if (err) {
@@ -407,13 +406,11 @@ app.post("/submit", (req, res) => {
                 return res.redirect("/secrets");
             }
 
-            console.log("Secret saved:", submittedSecret);
+            console.log("Secret saved:", secretsArray);
             res.redirect("/secrets");
         });
     });
 });
-
-
 
 
 app.listen('3000',()=>{
