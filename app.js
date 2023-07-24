@@ -53,16 +53,16 @@ const mongoUrl=`mongodb+srv://${process.env.CLIENT_IDm}/userDb`
 mongoose.connect(mongoUrl);
 
 
-//for listing secret of single user:
-const secrets= "";
-
 const userSchema = new mongoose.Schema({
-        email:String,
-        password:String,
-        googleId:String,
-        secret:[secrets],
-        facebookId:String,
-})
+    email: String,
+    password: String,
+    googleId: String,
+    secret: [{
+        secret: String // Array of objects with 'secret' property of type String
+    }],
+    facebookId: String,
+});
+
 
 
 userSchema.plugin(passportLocalMongoose) // this line will perform hashing nd salting task ,nd save user in database
