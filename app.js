@@ -61,7 +61,7 @@ const userSchema = new mongoose.Schema({
     email: String,
     password: String,
     googleId: String,
-    secret: userSecret,
+    secret: [userSecret],
     facebookId: String,
 });
 
@@ -231,6 +231,7 @@ app.get('/secrets', (req, res) => {
         console.log(err);
       } else {
         if (foundSecret) {
+        console.log(foundSecret)
           res.render('secrets', { usersPostedSecrets:foundSecret});
         }
       }
@@ -379,76 +380,43 @@ app.post('/login', passport.authenticate('local',
 
 
 
-// app.post("/submit", (req, res) => {
-//     if (!req.isAuthenticated()) {
-//         return res.redirect("/login");
-//     }
-
-//     const submittedSecret = req.body.secret;
-//     console.log(submittedSecret);
-//     console.log(req.user.id);
-
-//     User.findById(req.user.id, (err, foundOne) => {
-//         if (err) {
-//             console.error("Error finding user:", err);
-//             return res.redirect("/secrets");
-//         }
-
-//         if (!foundOne) {
-//             console.error("User not found");
-//             return res.redirect("/secrets");
-//         }
-
-//         // Push the new secret to the existing secrets array
-//         foundOne.secret.push({ secret: submittedSecret });
-
-//         foundOne.save((err) => {
-//             if (err) {
-//                 console.error("Error saving secret:", err);
-//                 return res.redirect("/secrets");
-//             }
-
-//             console.log("Secret saved:", submittedSecret);
-//             res.redirect("/secrets");
-//         });
-//     });
-// });
-
-
 app.post("/submit", (req, res) => {
-  if (!req.isAuthenticated()) {
-    return res.redirect("/login");
-  }
-
-  const submittedSecret = req.body.secret;
-  console.log(submittedSecret);
-  console.log(req.user.id);
-
-  User.findById(req.user.id, (err, foundOne) => {
-    if (err) {
-      console.error("Error finding user:", err);
-      return res.redirect("/secrets");
+    if (!req.isAuthenticated()) {
+        return res.redirect("/login");
     }
 
-    if (!foundOne) {
-      console.error("User not found");
-      return res.redirect("/secrets");
-    }
+    const submittedSecret = req.body.secret;
+    console.log(submittedSecret);
+    console.log(req.user.id);
 
-    // Push the new secret to the existing secrets array
-    foundOne.secret.secret = submittedSecret; // Save the submitted secret
+    User.findById(req.user.id, (err, foundOne) => {
+        if (err) {
+            console.error("Error finding user:", err);
+            return res.redirect("/secrets");
+        }
 
-    foundOne.save((err) => {
-      if (err) {
-        console.error("Error saving secret:", err);
-        return res.redirect("/secrets");
-      }
+        if (!foundOne) {
+            console.error("User not found");
+            return res.redirect("/secrets");
+        }
 
-      console.log("Secret saved:", submittedSecret);
-      res.redirect("/secrets");
+        // Push the new secret to the existing secrets array
+        foundOne.secret.push({ secret: submittedSecret });
+
+        foundOne.save((err) => {
+            if (err) {
+                console.error("Error saving secret:", err);
+                return res.redirect("/secrets");
+            }
+
+            console.log("Secret saved:", submittedSecret);
+            res.redirect("/secrets");
+        });
     });
-  });
 });
+
+
+
 
 app.listen('3000',()=>{
     console.log('app listen at port 3000')
