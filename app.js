@@ -385,6 +385,11 @@ app.post("/submit", (req, res) => {
     console.log(submittedSecret);
     console.log(req.user.id);
 
+      if (!submittedSecret.trim()) {
+        // If the submittedSecret is empty (contains only whitespace characters), redirect to the secret page
+        return res.redirect("/secrets");
+    }
+
     User.findById(req.user.id, (err, foundOne) => {
         if (err) {
             console.error("Error finding user:", err);
