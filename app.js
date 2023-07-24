@@ -52,7 +52,7 @@ const mongoUrl=`mongodb+srv://${process.env.CLIENT_IDm}/userDb`
 
 mongoose.connect(mongoUrl);
 const userSecret = new mongoose.Schema({
-secret :String
+secret :""
 
 })
 // const UserSecretModel = mongoose.model('UserSecretModel', userSecret);
